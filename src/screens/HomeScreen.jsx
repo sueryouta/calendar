@@ -48,7 +48,7 @@ export default function HomeScreen({ navigate }) {
   });
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: C.background, overflowY: 'auto' }}>
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', backgroundColor: C.background, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
       {/* Header */}
       <div style={{ backgroundColor: C.primaryDark, padding: '10px 20px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
         <span style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>

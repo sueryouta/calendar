@@ -33,7 +33,7 @@ export default function TaskListScreen({ navigate }) {
   });
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: C.background, overflow: 'hidden' }}>
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', backgroundColor: C.background, overflow: 'hidden' }}>
       {/* Filter chips */}
       <div style={{
         display: 'flex',
@@ -68,7 +68,7 @@ export default function TaskListScreen({ navigate }) {
       </div>
 
       {/* List */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: 16, paddingBottom: 80 }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: 16, paddingBottom: 80 }}>
         {sorted.length === 0
           ? <span style={{ display: 'block', textAlign: 'center', color: C.textLight, paddingTop: 40, fontSize: 15 }}>タスクがありません</span>
           : sorted.map(t => <TaskCard key={t.id} task={t} />)

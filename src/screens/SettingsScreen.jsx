@@ -39,7 +39,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <div style={{ flex: 1, backgroundColor: C.background, overflowY: 'auto' }}>
+    <div style={{ flex: 1, minHeight: 0, backgroundColor: C.background, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
 
       {/* Display settings */}
       <div style={section}>

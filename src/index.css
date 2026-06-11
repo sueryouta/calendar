@@ -11,10 +11,13 @@ html, body {
 }
 
 #root {
-  height: 100%;
-  width: 100%;
-  /* Safari iOS fallback */
-  height: -webkit-fill-available;
+  /* position: fixed で Safari iOS のビューポート高さを確定させる */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
 }
 
 body {

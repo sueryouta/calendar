@@ -189,7 +189,7 @@ export default function CalendarScreen({ navigate }) {
   const checkpoints = selectedTasks.filter(t => t.isCheckpoint);
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: C.background, overflow: 'hidden' }}>
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', backgroundColor: C.background, overflow: 'hidden' }}>
       {/* Month header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', backgroundColor: C.white, borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
         <button onClick={() => setCurrentMonth(m => subMonths(m, 1))} style={{ fontSize: 24, color: C.primary, lineHeight: '28px', padding: 8 }}>‹</button>
@@ -206,7 +206,7 @@ export default function CalendarScreen({ navigate }) {
         ))}
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
         {/* Calendar grid */}
         <div style={{ backgroundColor: C.white, borderBottom: `1px solid ${C.border}` }}>
           {weeks.map(w => (
