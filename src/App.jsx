@@ -4,6 +4,7 @@ import CalendarScreen from './screens/CalendarScreen';
 import TaskListScreen from './screens/TaskListScreen';
 import AddTaskScreen  from './screens/AddTaskScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import PasswordScreen, { isAuthenticated } from './screens/PasswordScreen';
 
 import { loadData }       from './store/taskStore';
 import { loadTemplates }  from './store/templateStore';
@@ -113,12 +114,24 @@ function AppContent() {
 }
 
 export default function App() {
+  const [authed, setAuthed] = useState(isAuthenticated);
+
   useEffect(() => {
-    loadTheme();
-    loadData();
-    loadTemplates();
-    loadCategories();
-  }, []);
+    if (authed) {
+      loadTheme();
+      loadData();
+      loadTemplates();
+      loadCategories();
+    }
+  }, [authed]);
+
+  if (!authed) {
+    return (
+      <div style={{ height: '100dvh' }}>
+        <PasswordScreen onSuccess={() => setAuthed(true)} />
+      </div>
+    );
+  }
 
   return <AppContent />;
 }
