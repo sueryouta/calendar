@@ -1,4 +1,4 @@
-const STORAGE_KEY = '@megane_categories';
+import { supabase } from '../lib/supabase';
 
 const DEFAULT_CATEGORIES = [
   { id: 'honsha',  name: '本社指示', color: '#e74c3c' },
@@ -20,17 +20,26 @@ function notify() {
 }
 
 export async function loadCategories() {
-  try {
-    const json = localStorage.getItem(STORAGE_KEY);
-    categories = json ? JSON.parse(json) : [...DEFAULT_CATEGORIES];
-  } catch {
-    categories = [...DEFAULT_CATEGORIES];
+  categories = [];
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) { categories = [...DEFAULT_CATEGORIES]; notify(); return; }
+
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .order('created_at', { ascending: true });
+
+  if (error) { categories = [...DEFAULT_CATEGORIES]; notify(); return; }
+
+  if (data.length === 0) {
+    const rows = DEFAULT_CATEGORIES.map(c => ({ ...c, user_id: user.id }));
+    const { data: inserted, error: insertError } = await supabase
+      .from('categories').insert(rows).select();
+    categories = (!insertError && inserted) ? inserted : [...DEFAULT_CATEGORIES];
+  } else {
+    categories = data;
   }
   notify();
-}
-
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(categories));
 }
 
 export function getCategories() {
@@ -38,15 +47,20 @@ export function getCategories() {
 }
 
 export async function addCategory(cat) {
-  const newCat = { ...cat, id: `cat_${Date.now()}` };
-  categories = [...categories, newCat];
-  save();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const newCat = { id: `cat_${Date.now()}`, ...cat, user_id: user.id };
+  const { data, error } = await supabase.from('categories').insert([newCat]).select().single();
+  if (error) { console.error('addCategory error:', error); return; }
+  categories = [...categories, data];
   notify();
-  return newCat;
+  return data;
 }
 
 export async function removeCategory(id) {
+  const { error } = await supabase.from('categories').delete().eq('id', id);
+  if (error) { console.error('removeCategory error:', error); return; }
   categories = categories.filter(c => c.id !== id);
-  save();
   notify();
 }

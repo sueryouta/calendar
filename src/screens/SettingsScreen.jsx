@@ -3,6 +3,7 @@ import { getSettings, updateSettings, subscribe } from '../store/taskStore';
 import { getCategories, subscribeCategories } from '../store/categoryStore';
 import { toggleTheme } from '../store/themeStore';
 import useTheme, { useIsDark } from '../hooks/useTheme';
+import { supabase } from '../lib/supabase';
 
 const DAY_LABELS = ['日', '月', '火', '水', '木', '金', '土'];
 
@@ -113,8 +114,28 @@ export default function SettingsScreen() {
         <div style={{ height: 1, backgroundColor: C.border }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, paddingBottom: 10 }}>
           <span style={{ fontSize: 15, color: C.text }}>データ保存先</span>
-          <span style={{ fontSize: 13, color: C.textLight }}>ブラウザ (localStorage)</span>
+          <span style={{ fontSize: 13, color: C.textLight }}>Supabase</span>
         </div>
+      </div>
+
+      {/* Logout */}
+      <div style={{ ...section }}>
+        <button
+          onClick={() => supabase.auth.signOut()}
+          style={{
+            width: '100%',
+            padding: '12px 0',
+            borderRadius: 8,
+            border: `1.5px solid ${C.danger}`,
+            backgroundColor: 'transparent',
+            color: C.danger,
+            fontSize: 15,
+            fontWeight: '600',
+            cursor: 'pointer',
+          }}
+        >
+          ログアウト
+        </button>
       </div>
 
       <div style={{ height: 40 }} />

@@ -1,6 +1,5 @@
+import { supabase } from '../lib/supabase';
 import { TEMPLATES } from '../constants';
-
-const STORAGE_KEY = '@megane_templates';
 
 let listeners = [];
 let templates = null;
@@ -15,17 +14,26 @@ function notify() {
 }
 
 export async function loadTemplates() {
-  try {
-    const json = localStorage.getItem(STORAGE_KEY);
-    templates = json ? JSON.parse(json) : [...TEMPLATES];
-  } catch {
-    templates = [...TEMPLATES];
+  templates = [];
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) { templates = [...TEMPLATES]; notify(); return; }
+
+  const { data, error } = await supabase
+    .from('templates')
+    .select('*')
+    .order('created_at', { ascending: true });
+
+  if (error) { templates = [...TEMPLATES]; notify(); return; }
+
+  if (data.length === 0) {
+    const rows = TEMPLATES.map(t => ({ ...t, user_id: user.id }));
+    const { data: inserted, error: insertError } = await supabase
+      .from('templates').insert(rows).select();
+    templates = (!insertError && inserted) ? inserted : [...TEMPLATES];
+  } else {
+    templates = data;
   }
   notify();
-}
-
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
 }
 
 export function getTemplates() {
@@ -33,15 +41,20 @@ export function getTemplates() {
 }
 
 export async function addTemplate(tmpl) {
-  const newTmpl = { ...tmpl, id: `t_${Date.now()}` };
-  templates = [...templates, newTmpl];
-  save();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const newTmpl = { id: `t_${Date.now()}`, ...tmpl, user_id: user.id };
+  const { data, error } = await supabase.from('templates').insert([newTmpl]).select().single();
+  if (error) { console.error('addTemplate error:', error); return; }
+  templates = [...templates, data];
   notify();
-  return newTmpl;
+  return data;
 }
 
 export async function removeTemplate(id) {
+  const { error } = await supabase.from('templates').delete().eq('id', id);
+  if (error) { console.error('removeTemplate error:', error); return; }
   templates = templates.filter(t => t.id !== id);
-  save();
   notify();
 }

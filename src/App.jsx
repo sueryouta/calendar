@@ -4,8 +4,9 @@ import CalendarScreen from './screens/CalendarScreen';
 import TaskListScreen from './screens/TaskListScreen';
 import AddTaskScreen  from './screens/AddTaskScreen';
 import SettingsScreen from './screens/SettingsScreen';
-import PasswordScreen, { isAuthenticated } from './screens/PasswordScreen';
+import LoginScreen    from './screens/PasswordScreen';
 
+import { supabase }       from './lib/supabase';
 import { loadData }       from './store/taskStore';
 import { loadTemplates }  from './store/templateStore';
 import { loadCategories } from './store/categoryStore';
@@ -32,8 +33,6 @@ function AppContent() {
 
   const currentTab = TABS.find(t => t.key === activeTab) || TABS[0];
 
-  const screenProps = { navigate };
-
   return (
     <div style={{
       display: 'flex',
@@ -44,7 +43,6 @@ function AppContent() {
       maxWidth: 800,
       margin: '0 auto',
     }}>
-      {/* Header */}
       <div style={{
         backgroundColor: C.primaryDark,
         padding: '0 16px',
@@ -57,15 +55,13 @@ function AppContent() {
         <span style={{ color: '#fff', fontWeight: '700', fontSize: 17 }}>{currentTab.title}</span>
       </div>
 
-      {/* Screen content */}
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-        {activeTab === 'home'     && <HomeScreen     {...screenProps} />}
-        {activeTab === 'calendar' && <CalendarScreen {...screenProps} />}
-        {activeTab === 'tasks'    && <TaskListScreen {...screenProps} />}
-        {activeTab === 'settings' && <SettingsScreen {...screenProps} />}
+        {activeTab === 'home'     && <HomeScreen     navigate={navigate} />}
+        {activeTab === 'calendar' && <CalendarScreen navigate={navigate} />}
+        {activeTab === 'tasks'    && <TaskListScreen navigate={navigate} />}
+        {activeTab === 'settings' && <SettingsScreen />}
       </div>
 
-      {/* Bottom tab bar */}
       <div style={{
         display: 'flex',
         backgroundColor: C.white,
@@ -97,7 +93,6 @@ function AppContent() {
         })}
       </div>
 
-      {/* AddTask modal overlay */}
       {showAddTask && (
         <div style={{
           position: 'absolute',
@@ -114,21 +109,56 @@ function AppContent() {
 }
 
 export default function App() {
-  const [authed, setAuthed] = useState(isAuthenticated);
+  const [session, setSession] = useState(undefined);
 
   useEffect(() => {
-    if (authed) {
-      loadTheme();
-      loadData();
-      loadTemplates();
-      loadCategories();
-    }
-  }, [authed]);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) {
+        loadTheme();
+        loadData();
+        loadTemplates();
+        loadCategories();
+      }
+    });
 
-  if (!authed) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(prev => {
+        const prevId = prev?.user?.id;
+        const nextId = session?.user?.id;
+        if (nextId && nextId !== prevId) {
+          loadTheme();
+          loadData();
+          loadTemplates();
+          loadCategories();
+        }
+        return session;
+      });
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (session === undefined) {
+    return (
+      <div style={{
+        height: '100dvh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f0f4f8',
+        fontSize: 16,
+        color: '#666',
+      }}>
+        読み込み中...
+      </div>
+    );
+  }
+
+  if (!session) {
     return (
       <div style={{ height: '100dvh' }}>
-        <PasswordScreen onSuccess={() => setAuthed(true)} />
+        <LoginScreen />
       </div>
     );
   }
