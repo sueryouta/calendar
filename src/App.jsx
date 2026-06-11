@@ -55,7 +55,7 @@ function AppContent() {
         <span style={{ color: '#fff', fontWeight: '700', fontSize: 17 }}>{currentTab.title}</span>
       </div>
 
-      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+      <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column' }}>
         {activeTab === 'home'     && <HomeScreen     navigate={navigate} />}
         {activeTab === 'calendar' && <CalendarScreen navigate={navigate} />}
         {activeTab === 'tasks'    && <TaskListScreen navigate={navigate} />}
