@@ -60,7 +60,7 @@ export default function AddTaskScreen({ onClose }) {
 
   async function handleSave() {
     if (!name.trim()) { setError('タスク名を入力してください'); return; }
-    if (startDate && startDate >= deadline) { setError('開始日は終了日より前にしてください'); return; }
+    if (startDate && startDate > deadline) { setError('開始日は終了日より後にしてください'); return; }
     setError('');
     await addTask({ name: name.trim(), startDate: startDate || null, deadline, category, difficulty, notes });
     onClose();

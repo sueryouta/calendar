@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import HomeScreen     from './screens/HomeScreen';
-import CalendarScreen from './screens/CalendarScreen';
 import TaskListScreen from './screens/TaskListScreen';
 import AddTaskScreen  from './screens/AddTaskScreen';
 import SettingsScreen from './screens/SettingsScreen';
@@ -14,10 +13,9 @@ import { loadTheme }      from './store/themeStore';
 import useTheme           from './hooks/useTheme';
 
 const TABS = [
-  { key: 'home',     label: 'ホーム',       emoji: '🏠', title: '店舗業務カレンダー' },
-  { key: 'calendar', label: 'カレンダー',   emoji: '📅', title: 'カレンダー' },
-  { key: 'tasks',    label: 'タスク',       emoji: '📋', title: 'タスク一覧' },
-  { key: 'settings', label: '設定',         emoji: '⚙️', title: '設定' },
+  { key: 'home',     label: 'ホーム',   emoji: '📅', title: '店舗業務カレンダー' },
+  { key: 'tasks',    label: 'タスク',   emoji: '📋', title: 'タスク一覧' },
+  { key: 'settings', label: '設定',     emoji: '⚙️', title: '設定' },
 ];
 
 function AppContent() {
@@ -56,9 +54,8 @@ function AppContent() {
       </div>
 
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-        {activeTab === 'home'     && <HomeScreen     navigate={navigate} />}
-        {activeTab === 'calendar' && <CalendarScreen navigate={navigate} />}
-        {activeTab === 'tasks'    && <TaskListScreen navigate={navigate} />}
+        {activeTab === 'home'  && <HomeScreen     navigate={navigate} />}
+        {activeTab === 'tasks' && <TaskListScreen navigate={navigate} />}
         {activeTab === 'settings' && <SettingsScreen />}
       </div>
 
